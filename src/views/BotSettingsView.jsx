@@ -155,14 +155,23 @@ export function BotSettingsView() {
 
         <form onSubmit={handleUpdateMenu} className="space-y-3">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
-              Public HTTPS WebApp URL
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-semibold text-slate-300">
+                Public HTTPS WebApp URL
+              </label>
+              <button
+                type="button"
+                onClick={() => setMenuUrl('https://telegram-mini-app-user.vercel.app/')}
+                className="text-[11px] text-indigo-400 hover:text-indigo-300 underline font-normal transition-colors cursor-pointer"
+              >
+                Use Production Mini App
+              </button>
+            </div>
             <input
               type="url"
               value={menuUrl}
               onChange={(e) => setMenuUrl(e.target.value)}
-              placeholder="https://your-ngrok-or-domain.app"
+              placeholder="https://telegram-mini-app-user.vercel.app/"
               className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500"
               required
             />

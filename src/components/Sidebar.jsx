@@ -60,7 +60,12 @@ export function Sidebar({ currentTab, setCurrentTab }) {
       {/* Footer Info & Customer App Link */}
       <div className="p-4 border-t border-slate-800 space-y-3">
         <a
-          href="http://localhost:5173"
+          href={
+            import.meta.env.VITE_USER_APP_URL ||
+            (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')
+              ? 'https://telegram-mini-app-user.vercel.app'
+              : 'http://localhost:5173')
+          }
           target="_blank"
           rel="noreferrer"
           className="flex items-center justify-between p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-xs font-medium text-slate-300 hover:text-white border border-slate-700/60 transition-colors"
