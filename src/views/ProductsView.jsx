@@ -567,7 +567,12 @@ export function ProductsView() {
                       />
                     </div>
                     <div className="text-[11px] text-slate-400">
-                      <p className="font-semibold text-white">Main Image Selected</p>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="font-semibold text-white">Main Image Selected</span>
+                        <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 text-[9px] font-bold border border-emerald-500/30">
+                          Type #1 (Default)
+                        </span>
+                      </div>
                       <p className="truncate max-w-[300px] text-slate-500">{formData.image_url}</p>
                     </div>
                   </div>
@@ -690,23 +695,26 @@ export function ProductsView() {
                   <div className="space-y-2">
                     {formData.sub_images.map((url, idx) => (
                       <div key={idx} className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold text-indigo-300 bg-indigo-500/20 border border-indigo-500/30 px-2 py-1 rounded-lg shrink-0">
+                          Type #{idx + 2}
+                        </span>
                         {url ? (
                           <img
                             src={url}
-                            alt={`Preview ${idx + 1}`}
+                            alt={`Preview ${idx + 2}`}
                             className="w-8 h-8 rounded-lg object-cover bg-slate-900 border border-slate-700 shrink-0"
                             onError={(e) => (e.target.style.display = 'none')}
                           />
                         ) : (
                           <div className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center text-[10px] text-slate-500 shrink-0">
-                            #{idx + 1}
+                            #{idx + 2}
                           </div>
                         )}
                         <input
                           type="text"
                           value={url}
                           onChange={(e) => handleSubImageChange(idx, e.target.value)}
-                          placeholder={`Photo URL #${idx + 1}`}
+                          placeholder={`Sub-Image / Type #${idx + 2} URL`}
                           className="flex-1 px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white"
                         />
                         <button

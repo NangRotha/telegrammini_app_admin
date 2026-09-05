@@ -19,7 +19,7 @@ import {
   Check,
   ExternalLink,
 } from 'lucide-react';
-import { getAllOrders, updateOrderStatus, checkOrderPayment } from '../services/api';
+import { getAllOrders, updateOrderStatus, checkOrderPayment, getMediaUrl } from '../services/api';
 import { useRealtime } from '../hooks/useRealtime';
 
 export function OrdersView() {
@@ -420,16 +420,36 @@ export function OrdersView() {
               </h4>
               <div className="rounded-xl bg-slate-800/40 border border-slate-800 divide-y divide-slate-800">
                 {selectedOrder.items?.map((item) => (
-                  <div key={item.id} className="p-3 flex justify-between text-xs">
-                    <div>
-                      <span className="font-semibold text-white">
-                        {item.product_title}
-                      </span>
-                      <span className="text-slate-400 block text-[11px]">
-                        ${item.price.toFixed(2)} × {item.quantity}
-                      </span>
+                  <div key={item.id} className="p-3 flex items-center justify-between gap-3 text-xs">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      {item.selected_image ? (
+                        <img
+                          src={getMediaUrl(item.selected_image)}
+                          alt=""
+                          className="w-10 h-10 rounded-lg object-cover bg-slate-900 border border-slate-700 shrink-0"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-500 shrink-0">
+                          <ShoppingBag className="w-5 h-5" />
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-semibold text-white truncate">
+                            {item.product_title}
+                          </span>
+                          {item.variant_name && (
+                            <span className="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-bold border border-indigo-500/30">
+                              {item.variant_name}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-slate-400 block text-[11px] mt-0.5">
+                          ${item.price.toFixed(2)} × {item.quantity}
+                        </span>
+                      </div>
                     </div>
-                    <span className="font-bold text-emerald-400">
+                    <span className="font-bold text-emerald-400 shrink-0">
                       ${item.subtotal.toFixed(2)}
                     </span>
                   </div>
