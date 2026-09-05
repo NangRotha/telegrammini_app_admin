@@ -6,6 +6,7 @@ import { CategoriesView } from './views/CategoriesView';
 import { OrdersView } from './views/OrdersView';
 import { BotSettingsView } from './views/BotSettingsView';
 import { PromoCodesView } from './views/PromoCodesView';
+import { PointsView } from './views/PointsView';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState('dashboard');
@@ -23,6 +24,7 @@ export default function App() {
         {currentTab === 'products' && <ProductsView />}
         {currentTab === 'categories' && <CategoriesView />}
         {currentTab === 'promocodes' && <PromoCodesView />}
+        {currentTab === 'points' && <PointsView />}
         {currentTab === 'orders' && <OrdersView />}
         {currentTab === 'bot' && <BotSettingsView />}
       </main>

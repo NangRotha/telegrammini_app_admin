@@ -198,3 +198,77 @@ export async function sendTestMessage(telegramId, message) {
   return res.json();
 }
 
+// ==================== Loyalty Points & Users CRUD ====================
+
+export async function getUsers(search = '') {
+  const url = search ? `${API_BASE}/users?search=${encodeURIComponent(search)}` : `${API_BASE}/users`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Failed to fetch customer loyalty points');
+  return res.json();
+}
+
+export async function createUser(payload) {
+  const res = await fetch(`${API_BASE}/users`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to register customer');
+  }
+  return res.json();
+}
+
+export async function updateUser(id, payload) {
+  const res = await fetch(`${API_BASE}/users/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to update customer');
+  }
+  return res.json();
+}
+
+export async function adjustUserPoints(id, pointsDelta, reason = '', notifyUser = true) {
+  const res = await fetch(`${API_BASE}/users/${id}/points`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      points_delta: Number(pointsDelta),
+      reason: reason || 'Admin manual adjustment',
+      notify_user: notifyUser,
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to adjust points');
+  }
+  return res.json();
+}
+
+export async function resetUserPoints(id) {
+  const res = await fetch(`${API_BASE}/users/${id}/points`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to reset points');
+  }
+  return res.json();
+}
+
+export async function deleteUser(id) {
+  const res = await fetch(`${API_BASE}/users/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to delete customer');
+  }
+  return res.json();
+}
+

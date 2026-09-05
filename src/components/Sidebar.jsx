@@ -8,6 +8,7 @@ import {
   Ticket,
   ExternalLink,
   Store,
+  Coins,
 } from 'lucide-react';
 
 export function Sidebar({ currentTab, setCurrentTab }) {
@@ -16,6 +17,7 @@ export function Sidebar({ currentTab, setCurrentTab }) {
     { id: 'products', label: 'Products', icon: Package },
     { id: 'categories', label: 'Categories', icon: Tags },
     { id: 'promocodes', label: 'Promo Codes', icon: Ticket },
+    { id: 'points', label: 'Loyalty Points', icon: Coins },
     { id: 'orders', label: 'Orders Workflow', icon: ShoppingBag },
     { id: 'bot', label: 'Telegram Bot', icon: Bot },
   ];
