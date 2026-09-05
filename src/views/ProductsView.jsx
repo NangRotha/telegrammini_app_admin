@@ -80,7 +80,16 @@ export function ProductsView() {
   useRealtime(
     useCallback(
       (event) => {
-        if (event.type === 'PRODUCT_UPDATED' || event.type === 'CATEGORY_UPDATED') {
+        if (event.type === 'PRODUCT_UPDATED') {
+          if (event.data?.action === 'delete' && event.data?.product_id) {
+            setProducts((prev) => prev.filter((p) => p.id !== event.data.product_id));
+          } else if (event.data?.action === 'update' && event.data?.product) {
+            const updated = event.data.product;
+            setProducts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+          }
+          loadData(true);
+        }
+        if (event.type === 'CATEGORY_UPDATED') {
           loadData(true);
         }
       },

@@ -23,6 +23,7 @@ import {
   updatePromoCode,
   deletePromoCode,
 } from '../services/api';
+import { useRealtime } from '../hooks/useRealtime';
 
 export function PromoCodesView() {
   const [promocodes, setPromocodes] = useState([]);
@@ -32,6 +33,14 @@ export function PromoCodesView() {
   const [editingPromo, setEditingPromo] = useState(null);
   const [copiedCode, setCopiedCode] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [deleteConfirmPromo, setDeleteConfirmPromo] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const showToast = (msg, type = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   // Quick Calculator State
   const [testCode, setTestCode] = useState('');
@@ -65,6 +74,18 @@ export function PromoCodesView() {
   useEffect(() => {
     loadPromoCodes();
   }, [loadPromoCodes]);
+
+  // Real-time synchronization for promo codes
+  useRealtime(
+    useCallback(
+      (event) => {
+        if (event.type === 'PROMO_UPDATED') {
+          loadPromoCodes(true);
+        }
+      },
+      [loadPromoCodes]
+    )
+  );
 
   const handleOpenCreate = () => {
     setEditingPromo(null);
@@ -107,15 +128,21 @@ export function PromoCodesView() {
     }
   };
 
-  const handleDelete = async (promo) => {
-    if (!window.confirm(`Are you sure you want to delete promo code "${promo.code}"?`)) {
-      return;
-    }
+  const confirmDeletePromo = async (promo) => {
+    if (!promo) return;
+    setDeleting(true);
     try {
       await deletePromoCode(promo.id);
       setPromocodes((prev) => prev.filter((p) => p.id !== promo.id));
+      showToast(`Promo code "${promo.code}" deleted successfully!`);
+      setDeleteConfirmPromo(null);
+      if (modalOpen && editingPromo?.id === promo.id) {
+        setModalOpen(false);
+      }
     } catch (err) {
-      alert(`Failed to delete: ${err.message}`);
+      alert(`Failed to delete promo code: ${err.message}`);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -422,8 +449,9 @@ export function PromoCodesView() {
                     <span>Edit</span>
                   </button>
                   <button
-                    onClick={() => handleDelete(promo)}
+                    onClick={() => setDeleteConfirmPromo(promo)}
                     className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 text-xs font-medium flex items-center gap-1 border border-rose-500/20 transition-colors"
+                    title="Delete promo code"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Delete</span>
@@ -582,25 +610,88 @@ export function PromoCodesView() {
               </div>
 
               {/* Modal Buttons */}
-              <div className="flex justify-end space-x-2 pt-3 border-t border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs shadow-md shadow-indigo-600/30 flex items-center gap-1.5"
-                >
-                  {saving && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                  <span>{saving ? 'Saving...' : editingPromo ? 'Update Code' : 'Save Promo Code'}</span>
-                </button>
+              <div className="flex items-center justify-between pt-3 border-t border-slate-800">
+                {editingPromo ? (
+                  <button
+                    type="button"
+                    onClick={() => setDeleteConfirmPromo(editingPromo)}
+                    className="px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 text-xs font-semibold flex items-center gap-1.5 border border-rose-500/30 transition-colors"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete Code</span>
+                  </button>
+                ) : (
+                  <div />
+                )}
+                <div className="flex items-center space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => setModalOpen(false)}
+                    className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs shadow-md shadow-indigo-600/30 flex items-center gap-1.5"
+                  >
+                    {saving && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
+                    <span>{saving ? 'Saving...' : editingPromo ? 'Update Code' : 'Save Promo Code'}</span>
+                  </button>
+                </div>
               </div>
             </form>
           </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmPromo && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
+          <div className="w-full max-w-sm rounded-2xl bg-slate-900 border border-slate-800 p-5 text-white shadow-2xl space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-white">Delete Promo Code</h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Are you sure you want to permanently delete code{' '}
+                  <span className="font-mono text-amber-400 font-bold">
+                    {deleteConfirmPromo.code}
+                  </span>?
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={() => setDeleteConfirmPromo(null)}
+                className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={() => confirmDeletePromo(deleteConfirmPromo)}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-rose-600/30 transition-all"
+              >
+                {deleting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
+                <span>{deleting ? 'Deleting...' : 'Confirm Delete'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-xl bg-emerald-500 text-slate-950 font-bold text-xs shadow-2xl flex items-center gap-2 animate-in slide-in-from-bottom-2">
+          <Check className="w-4 h-4" />
+          <span>{toast.msg}</span>
         </div>
       )}
     </div>

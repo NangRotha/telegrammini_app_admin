@@ -1,5 +1,26 @@
 const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
+export function getMediaUrl(url) {
+  if (!url) return '';
+  if (
+    url.startsWith('http://') ||
+    url.startsWith('https://') ||
+    url.startsWith('data:') ||
+    url.startsWith('blob:')
+  ) {
+    return url;
+  }
+  if (url.startsWith('/uploads') && API_BASE.startsWith('http')) {
+    try {
+      const origin = new URL(API_BASE).origin;
+      return `${origin}${url}`;
+    } catch {
+      return url;
+    }
+  }
+  return url;
+}
+
 export async function getDashboardStats() {
   const res = await fetch(`${API_BASE}/stats`);
   if (!res.ok) throw new Error('Failed to fetch dashboard stats');

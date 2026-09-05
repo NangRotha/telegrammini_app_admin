@@ -25,6 +25,7 @@ import {
   updateAlert,
   deleteAlert,
   uploadMedia,
+  getMediaUrl,
 } from '../services/api';
 import { useRealtime } from '../hooks/useRealtime';
 
@@ -145,6 +146,7 @@ export function AlertsView() {
       alert(`Image upload failed: ${err.message}`);
     } finally {
       setUploadingImage(false);
+      if (e.target) e.target.value = '';
     }
   };
 
@@ -360,9 +362,12 @@ export function AlertsView() {
                   <div className="w-20 h-20 rounded-xl bg-slate-800 border border-slate-700/60 overflow-hidden shrink-0 flex items-center justify-center">
                     {item.image_url ? (
                       <img
-                        src={item.image_url}
+                        src={getMediaUrl(item.image_url)}
                         alt={item.title}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
                       />
                     ) : (
                       <div className="text-center p-2">
@@ -591,9 +596,12 @@ export function AlertsView() {
                   {formData.image_url && (
                     <div className="relative w-full h-32 rounded-xl bg-slate-800 overflow-hidden border border-slate-700">
                       <img
-                        src={formData.image_url}
+                        src={getMediaUrl(formData.image_url)}
                         alt="Banner Preview"
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.opacity = '0.3';
+                        }}
                       />
                       <button
                         type="button"
@@ -689,9 +697,12 @@ export function AlertsView() {
               {previewAlert.image_url ? (
                 <div className="w-full h-44 bg-slate-800 overflow-hidden">
                   <img
-                    src={previewAlert.image_url}
+                    src={getMediaUrl(previewAlert.image_url)}
                     alt={previewAlert.title}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
                   />
                 </div>
               ) : (
