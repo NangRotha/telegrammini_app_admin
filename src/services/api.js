@@ -82,6 +82,19 @@ export async function createCategory(payload) {
   return res.json();
 }
 
+export async function updateCategory(id, payload) {
+  const res = await fetch(`${API_BASE}/categories/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to update category');
+  }
+  return res.json();
+}
+
 export async function deleteCategory(id) {
   const res = await fetch(`${API_BASE}/categories/${id}`, { method: 'DELETE' });
   if (!res.ok) throw new Error('Failed to delete category');
