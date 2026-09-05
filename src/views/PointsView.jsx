@@ -59,7 +59,7 @@ export function PointsView() {
     username: '',
     phone: '',
     default_address: '',
-    points: 100,
+    points: 0,
   });
 
   // Edit Form
@@ -268,7 +268,7 @@ export function PointsView() {
         username: '',
         phone: '',
         default_address: '',
-        points: 100,
+        points: 0,
       });
     } catch (err) {
       alert(`Failed to register customer: ${err.message}`);

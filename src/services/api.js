@@ -285,3 +285,94 @@ export async function deleteUser(id) {
   return res.json();
 }
 
+// ==================== Alert Popups CRUD ====================
+
+export async function getAlerts(activeOnly = false) {
+  const res = await fetch(`${API_BASE}/alerts?active_only=${activeOnly}`);
+  if (!res.ok) throw new Error('Failed to fetch alert popups');
+  return res.json();
+}
+
+export async function createAlert(payload) {
+  const res = await fetch(`${API_BASE}/alerts`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to create alert popup');
+  }
+  return res.json();
+}
+
+export async function updateAlert(id, payload) {
+  const res = await fetch(`${API_BASE}/alerts/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to update alert popup');
+  }
+  return res.json();
+}
+
+export async function deleteAlert(id) {
+  const res = await fetch(`${API_BASE}/alerts/${id}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error('Failed to delete alert popup');
+  return true;
+}
+
+// ==================== Store Settings & Branding & Auth ====================
+
+export async function getSettings() {
+  const res = await fetch(`${API_BASE}/settings`);
+  if (!res.ok) throw new Error('Failed to fetch store settings');
+  return res.json();
+}
+
+export async function updateSettings(payload) {
+  const res = await fetch(`${API_BASE}/settings`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to update store settings');
+  }
+  return res.json();
+}
+
+export async function adminLogin(username, password) {
+  const res = await fetch(`${API_BASE}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Invalid username or password');
+  }
+  return res.json();
+}
+
+export async function changeAdminPassword(currentPassword, newPassword) {
+  const res = await fetch(`${API_BASE}/auth/change-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      current_password: currentPassword,
+      new_password: newPassword,
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to change password');
+  }
+  return res.json();
+}
+
+
